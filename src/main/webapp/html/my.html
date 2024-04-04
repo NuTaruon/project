@@ -152,10 +152,10 @@
         }
 
         $.get(url, function (response) {
-            // remove all existing rows
+
             $("tr:has(td)").remove();
 
-            //arr accounts data
+
             $.each(response, function (i, item) {
                 $('<tr>').html("<td>"
                     + item.id + "</td><td>"
