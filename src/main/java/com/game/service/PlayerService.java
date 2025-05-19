@@ -24,6 +24,7 @@ public class PlayerService {
     }
 
     public List<Player> getAll(int pageNumber, int pageSize) {
+        System.out.println("PlayerService.getAll: pageNumber = " + pageNumber + ", pageSize = " + pageSize);
         return playerRepository.getAll(pageNumber, pageSize);
     }
 
