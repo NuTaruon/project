@@ -28,8 +28,8 @@ public class PlayerController {
     }
 
     @GetMapping()
-    public List<PlayerInfo> getAll(@RequestParam(required = false) Integer pageNumber,
-                                   @RequestParam(required = false) Integer pageSize) {
+    public List<PlayerInfo> getAll(@RequestParam(value = "pageNumber", required = false) Integer pageNumber,
+                                   @RequestParam(value = "pageSize", required = false) Integer pageSize) {
         pageNumber = isNull(pageNumber) ? 0 : pageNumber;
         pageSize = isNull(pageSize) ? 3 : pageSize;
 
