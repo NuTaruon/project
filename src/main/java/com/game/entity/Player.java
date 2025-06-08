@@ -1,23 +1,49 @@
 package com.game.entity;
-
+import jakarta.persistence.*;
 import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+@Entity
+@NamedQuery(name="Player.countAll",
+        query = "SELECT count(p) FROM Player p")
 
+@Table(name="player",schema="rpg")
 public class Player {
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    @Column(nullable = false)
+    @JsonProperty("id")
     private Long id;
 
+    @Column(name="name",nullable = false,length = 12)
+    @JsonProperty("name")
     private String name;
 
+    @Column(name="title",nullable = false,length = 30)
+    @JsonProperty("title")
     private String title;
 
+    @Column(name="race",nullable = false)
+    @Enumerated(EnumType.ORDINAL)
+    @JsonProperty("race")
     private Race race;
 
+    @Column(name="profession",nullable = false)
+    @Enumerated(EnumType.ORDINAL)
+    @JsonProperty("profession")
     private Profession profession;
 
+    @Column(name="birthday",nullable = false)
+    @JsonProperty("birthday")
     private Date birthday;
 
+    @Column(name="banned",nullable = false)
+    @JsonProperty("banned")
     private Boolean banned;
 
+    @Column(name="level",nullable = false)
+    @JsonProperty("level")
     private Integer level;
 
     public Player() {
