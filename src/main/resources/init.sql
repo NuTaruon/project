@@ -1,3 +1,14 @@
+CREATE TABLE IF NOT EXISTS rpg.player (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    title VARCHAR(255),
+    race INT,
+    profession INT,
+    birthday TIMESTAMP,
+    level INT,
+    banned BIT
+);
+
 INSERT INTO rpg.player (id, name, title, race, profession, birthday, level, banned)
 VALUES (1, 'Ниус', 'Приходящий Без Шума', 6, 1, '2009-06-09 00:44:40.000000', 33, '\0'),
        (2, 'Никрашш', 'НайтВульф', 4, 0, '2006-07-09 08:50:40.000000', 58, '\0'),
