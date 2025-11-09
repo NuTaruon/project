@@ -6,6 +6,9 @@ import java.util.Date;
 
 @Entity
 @Table(name="player")
+@NamedQuery(
+        name = "Player_getAllCount",
+        query = "select count(p) from Player p")
 public class Player {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,12 +20,12 @@ public class Player {
     @Column(nullable = false, length = 30)
     private String title;
 
-    @Column(nullable = false)
     @Enumerated(EnumType.ORDINAL)
+    @Column(nullable = false)
     private Race race;
 
-    @Column(nullable = false)
     @Enumerated(EnumType.ORDINAL)
+    @Column(nullable = false)
     private Profession profession;
 
     @Column(nullable = false)
