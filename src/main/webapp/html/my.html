@@ -258,6 +258,12 @@
         td_profession.innerHTML = getDropdownProfessionHtml(id);
         $(profession_id).val(profession_current_value).change();
 
+        let td_level = children[5];
+        td_level.innerHTML = "<input id='input_level_" + id + "' type='text' value='" + td_level.innerHTML + "'>";
+
+        let td_birthday = children[6];
+        td_birthday.innerHTML = "<input id='input_birthday_" + id + "' type='date' value='" + getBirthDate(td_birthday.innerHTML) + "' min='1926-01-01' max='2126-12-31'>";
+
         let td_banned = children[7];
         let banned_id = "#select_banned_" + id;
         let banned_current_value = td_banned.innerHTML;
@@ -272,6 +278,10 @@
         let value_race = $("#select_race_" + id).val();
         let value_profession = $("#select_profession_" + id).val();
         let value_banned = $("#select_banned_" + id).val();
+        let value_level = $("#input_level_" + id).val();
+
+        let value_birthday = $("#input_birthday_" + id).val();
+        let birthDayUnix = new Date(value_birthday).getTime();
 
         let url = "/rest/players/" + id;
         $.ajax({
@@ -280,7 +290,7 @@
             dataType: 'json',
             contentType: 'application/json;charset=UTF-8',
             async: false,
-            data: JSON.stringify({"name": value_name, "title": value_title, "race": value_race, "profession": value_profession, "banned": value_banned}),
+            data: JSON.stringify({"name": value_name, "title": value_title, "race": value_race, "profession": value_profession, "banned": value_banned, "level": value_level, "birthday": birthDayUnix}),
             success: function () {
                 showList(getCurrentPage());
             }
@@ -369,6 +379,11 @@
             + "<option value='false' >false</option>"
             + "<option value='true' >true</option>"
             + "</select>";
+    }
+
+    function getBirthDate(date) {
+        const [day, month, year] = date.split('.');
+        return `${year}-${month}-${day}`;
     }
 </script>
 </body>
