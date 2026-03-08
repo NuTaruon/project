@@ -7,6 +7,9 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 
+
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PreDestroy;
@@ -29,22 +32,36 @@ public class PlayerRepositoryDB implements IPlayerRepository {
         properties.put(Environment.PASS, "sa");
         properties.put(Environment.SHOW_SQL, "true");
         properties.put(Environment.HBM2DDL_AUTO, "update");
-        sessionFactory = new Configuration().setProperties(properties).buildSessionFactory();
+        sessionFactory = new Configuration()
+                .addAnnotatedClass(Player.class)
+                .setProperties(properties)
+                .buildSessionFactory();
     }
 
     @Override
     public List<Player> getAll(int pageNumber, int pageSize) {
-
-        try (Session session = sessionFactory.openSession()){
+        try ( Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
-            session.createNativeQuery("SELECT * from player").list();
+            Query<Player> query = session.createQuery("select p from Player p", Player.class);
+            query.setFirstResult(pageNumber * pageSize);
+            query.setMaxResults(pageSize);
+            List<Player> resultList = query.list();
+            transaction.commit();
+            return resultList;
         }
-        return null;
+
+
+
     }
 
     @Override
     public int getAllCount() {
-        return 0;
+        try (Session session = sessionFactory.openSession()){
+            Transaction transaction = session.beginTransaction();
+            int allCount = session.createNativeQuery("SELECT count(*) from rpg.player", Integer.class).executeUpdate();
+            transaction.commit();
+            return allCount;
+        }
     }
 
     @Override
@@ -59,16 +76,29 @@ public class PlayerRepositoryDB implements IPlayerRepository {
 
     @Override
     public Optional<Player> findById(long id) {
-        return Optional.empty();
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+            Query<Player> query = session.createQuery("select p from Player p where p.id = :id", Player.class);
+            query.setParameter("id", id);
+            transaction.commit();
+            return Optional.of(query.getSingleResult());
+        }
+
     }
 
     @Override
     public void delete(Player player) {
-
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+            NativeQuery<Player> nativeQuery = session.createNativeQuery("DELETE FROM rpg.player WHERE id = :playerId", Player.class);
+            nativeQuery.setParameter("playerId", player.getId());
+            nativeQuery.executeUpdate();
+            transaction.commit();
+        }
     }
 
     @PreDestroy
     public void beforeStop() {
-
+        sessionFactory.close();
     }
 }
