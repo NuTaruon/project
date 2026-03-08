@@ -13,7 +13,6 @@ import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PreDestroy;
-import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -26,9 +25,11 @@ public class PlayerRepositoryDB implements IPlayerRepository {
 
     public PlayerRepositoryDB() {
         Properties properties = new Properties();
-        properties.put(Environment.DRIVER, "com.mysql.cj.jdbc.Driver");
+        properties.put(Environment.DRIVER, "com.p6spy.engine.spy.P6SpyDriver");
+        properties.put(Environment.URL, "jdbc:p6spy:mysql://localhost:3306/rpg");
+        //properties.put(Environment.DRIVER, "com.mysql.cj.jdbc.Driver");
         properties.put(Environment.DIALECT, "org.hibernate.dialect.MySQL8Dialect");
-        properties.put(Environment.URL, "jdbc:mysql://localhost:3306/rpg");
+        //properties.put(Environment.URL, "jdbc:mysql://localhost:3306/rpg");
         properties.put(Environment.USER, "sa");
         properties.put(Environment.PASS, "sa");
         properties.put(Environment.SHOW_SQL, "true");
@@ -42,12 +43,10 @@ public class PlayerRepositoryDB implements IPlayerRepository {
     @Override
     public List<Player> getAll(int pageNumber, int pageSize) {
         try ( Session session = sessionFactory.openSession()) {
-            Transaction transaction = session.beginTransaction();
-            Query<Player> query = session.createNativeQuery("select p from player p", Player.class);
+            NativeQuery<Player> query = session.createNativeQuery("select * from rpg.player", Player.class);
             query.setFirstResult(pageNumber * pageSize);
             query.setMaxResults(pageSize);
             List<Player> resultList = query.list();
-            transaction.commit();
             return resultList;
         }
 
@@ -58,10 +57,9 @@ public class PlayerRepositoryDB implements IPlayerRepository {
     @Override
     public int getAllCount() {
         try (Session session = sessionFactory.openSession()){
-            Transaction transaction = session.beginTransaction();
-            int allCount = session.createNamedQuery("Player_GetAll", Integer.class).executeUpdate();
-            transaction.commit();
-            return allCount;
+            Query<Long> playerGetAllCount = session.createNamedQuery("player_getAllCount", Long.class);
+            Long longPlayerGetAllCount = playerGetAllCount.uniqueResult();
+            return Math.toIntExact(longPlayerGetAllCount);
         }
     }
 
