@@ -13,6 +13,7 @@ import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PreDestroy;
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -42,7 +43,7 @@ public class PlayerRepositoryDB implements IPlayerRepository {
     public List<Player> getAll(int pageNumber, int pageSize) {
         try ( Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
-            Query<Player> query = session.createQuery("select p from Player p", Player.class);
+            Query<Player> query = session.createNativeQuery("select p from player p", Player.class);
             query.setFirstResult(pageNumber * pageSize);
             query.setMaxResults(pageSize);
             List<Player> resultList = query.list();
@@ -58,7 +59,7 @@ public class PlayerRepositoryDB implements IPlayerRepository {
     public int getAllCount() {
         try (Session session = sessionFactory.openSession()){
             Transaction transaction = session.beginTransaction();
-            int allCount = session.createNativeQuery("SELECT count(*) from rpg.player", Integer.class).executeUpdate();
+            int allCount = session.createNamedQuery("Player_GetAll", Integer.class).executeUpdate();
             transaction.commit();
             return allCount;
         }
@@ -66,12 +67,22 @@ public class PlayerRepositoryDB implements IPlayerRepository {
 
     @Override
     public Player save(Player player) {
-        return null;
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+            session.persist(player);
+            transaction.commit();
+            return player;
+        }
     }
 
     @Override
     public Player update(Player player) {
-        return null;
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+            session.update(player);
+            transaction.commit();
+            return player;
+        }
     }
 
     @Override

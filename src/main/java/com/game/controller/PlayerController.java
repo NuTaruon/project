@@ -56,7 +56,7 @@ public class PlayerController {
 
         boolean banned = !isNull(info.banned) && info.banned;
 
-        Player player = playerService.createPlayer(info.name, info.title, info.race, info.profession, info.birthday, banned, info.level);
+        Player player = playerService.createPlayer(info.name, info.title, info.race, info.profession, info.birthday, info.banned, info.level);
         return ResponseEntity.status(HttpStatus.OK).body(toPlayerInfo(player));
     }
 
