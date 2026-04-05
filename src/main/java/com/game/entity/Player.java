@@ -10,6 +10,7 @@ import java.util.Date;
 public class Player {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(nullable = false)
     private Long id;
 
