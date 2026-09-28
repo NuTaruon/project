@@ -3,6 +3,7 @@ package com.game.entity;
 import javax.persistence.*;
 import java.util.Date;
 
+@NamedQuery(name = "Player_count", query = "SELECT COUNT(p) FROM Player p")
 @Entity
 @Table(name = "player")
 public class Player {

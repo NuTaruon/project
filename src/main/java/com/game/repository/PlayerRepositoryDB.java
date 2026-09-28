@@ -1,9 +1,12 @@
 package com.game.repository;
 
 import com.game.entity.Player;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PreDestroy;
@@ -28,36 +31,59 @@ public class PlayerRepositoryDB implements IPlayerRepository {
 
     @Override
     public List<Player> getAll(int pageNumber, int pageSize) {
-        return null;
+        try (Session session = this.sessionFactory.openSession()) {
+            NativeQuery <Player> query = session.createNativeQuery("select * from player");
+            query.setFirstResult(pageNumber);
+            query.setMaxResults(pageSize);
+            return query.list();
+        }
+
     }
 
     @Override
     public int getAllCount() {
-        return 0;
+        try (Session session = this.sessionFactory.openSession()) {
+         Query query = session.createNativeQuery("select count(p) from player", Player.class);
+         return ((Long) query.uniqueResult()).intValue();
+        }
+
     }
 
     @Override
     public Player save(Player player) {
-        return null;
+        try (Session session = this.sessionFactory.openSession()) {
+            session.save(player);
+            return player;
+        }
     }
 
     @Override
     public Player update(Player player) {
-        return null;
+        try (Session session = this.sessionFactory.openSession()) {
+            session.update(player);
+            return player;
+        }
     }
 
     @Override
     public Optional<Player> findById(long id) {
-        return Optional.empty();
-    }
+        try (Session session = this.sessionFactory.openSession()) {
+            return Optional.ofNullable(session.get(Player.class, id));
+        }
+        }
 
     @Override
     public void delete(Player player) {
-
+      try (Session session = this.sessionFactory.openSession()) {
+          session.remove(player);
+          session.flush();
+          session.clear();
+      }
     }
 
     @PreDestroy
     public void beforeStop() {
-
+       this.sessionFactory.close();
     }
 }
+
