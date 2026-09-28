@@ -3,6 +3,7 @@ package com.game.repository;
 import com.game.entity.Player;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.query.NativeQuery;
@@ -26,13 +27,14 @@ public class PlayerRepositoryDB implements IPlayerRepository {
         properties.put(Environment.DIALECT, "org.hibernate.dialect.MySQL8Dialect");
         properties.put(Environment.HBM2DDL_AUTO, "update");
 
+
         this.sessionFactory = new Configuration().setProperties(properties).addAnnotatedClass(Player.class).buildSessionFactory();
     }
 
     @Override
     public List<Player> getAll(int pageNumber, int pageSize) {
         try (Session session = this.sessionFactory.openSession()) {
-            NativeQuery <Player> query = session.createNativeQuery("select * from player");
+            NativeQuery <Player> query = session.createNativeQuery("select * from player", Player.class);
             query.setFirstResult(pageNumber);
             query.setMaxResults(pageSize);
             return query.list();
@@ -43,7 +45,7 @@ public class PlayerRepositoryDB implements IPlayerRepository {
     @Override
     public int getAllCount() {
         try (Session session = this.sessionFactory.openSession()) {
-         Query query = session.createNativeQuery("select count(p) from player", Player.class);
+         Query query = session.createNativeQuery("SELECT COUNT(*) FROM player", Player.class);
          return ((Long) query.uniqueResult()).intValue();
         }
 
@@ -52,15 +54,20 @@ public class PlayerRepositoryDB implements IPlayerRepository {
     @Override
     public Player save(Player player) {
         try (Session session = this.sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
             session.save(player);
+            transaction.commit();
             return player;
+
         }
     }
 
     @Override
     public Player update(Player player) {
         try (Session session = this.sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
             session.update(player);
+            transaction.commit();
             return player;
         }
     }
@@ -75,9 +82,11 @@ public class PlayerRepositoryDB implements IPlayerRepository {
     @Override
     public void delete(Player player) {
       try (Session session = this.sessionFactory.openSession()) {
+          Transaction transaction = session.beginTransaction();
           session.remove(player);
           session.flush();
           session.clear();
+          transaction.commit();
       }
     }
 
